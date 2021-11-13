@@ -15,5 +15,5 @@ stdin.on('data', (data) => {
     res = +one - +two;
     stdout.write(`${one} - ${two} = ${res}`);
   }
-  process.exit();
+  // process.exit();
 });
