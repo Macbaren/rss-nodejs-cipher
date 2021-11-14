@@ -1,12 +1,13 @@
 const fs = require('fs');
 const { stdin, stdout, stderr } = require('process');
+const readline = require('readline');
 
 const caesar = require('./ciphers/caesar');
 const rot8 = require('./ciphers/rot-8');
 const atobash = require('./ciphers/atobash');
 
 const config = process.argv.slice(2);
-console.log('config', config);
+// console.log('config', config);
 
 //проверка на наличие конфига
 if (config.length === 0) {
@@ -18,17 +19,16 @@ if (config.length !== new Set(config).size) {
   stderr.write('You entered encorrect arguments');
   process.exit(1);
 }
-// проверка на введение флага config
+// проверка на наличие в вводе флага config
 if (config.indexOf('-c') === -1 && config.indexOf('--config') === -1) {
   stderr.write('You have not entered or wrong config flag ');
   process.exit(1);
 }
 
-const confFlag = config.indexOf('-c') > -1 ? '-c' : '--config'; // определение актуального флага
+const confFlag = config.indexOf('-c') > -1 ? '-c' : '--config'; // определение актуального флага конфига
 
 const cipherSequense = config[config.indexOf(confFlag) + 1];
 const csArr = cipherSequense.split('-'); // получение массива шифров
-console.log('config', csArr);
 
 // проверка на валидность последовательности шифров
 if (
@@ -45,22 +45,37 @@ if (config.indexOf('-i') === -1 && config.indexOf('--input') === -1) {
   process.exit(1);
 }
 
-const inputFlag = config.indexOf('-i') > -1 ? '-i' : '--input'; // определение актуального флага
-const inputPath = config[config.indexOf(inputFlag) + 1]; // получение адреса инпута
+const inputFlag = config.indexOf('-i') > -1 ? '-i' : '--input'; // определение актуального флага инпута
+let inputPath = config[config.indexOf(inputFlag) + 1]; // получение адреса инпута
 
-let newPath = '';
+// получение данных из cli при отсуствии инпута реализовано частично - прерывает приложение
 if (!fs.existsSync(inputPath)) {
-  stderr.write('Wrong input path. Please input actual path');
-  stdin.on('data', (data) => {
-    newPath = data.toString();
-  });
-  stdout.write(newPath);
-  // process.exit(1);
-}
-console.log('input', inputPath, newPath);
+  const rl = readline.createInterface(process.stdin, process.stdout);
 
+  rl.setPrompt('Wrong input path. Please input actual path format a-z 0-9 \n');
+  rl.prompt();
+  rl.on('line', function (line) {
+    fs.writeFile('input.txt', line, (err) => {
+      if (err) throw err;
+      console.log('The file has been saved!');
+    });
+    console.log('input', input);
+    rl.close();
+  }).on('close', function () {
+    process.exit(1);
+  });
+}
+
+const outputFlag = config.indexOf('-o') > -1 ? '-o' : '--output'; // определение актуального флага аутпута
+let outputPath = config[config.indexOf(outputFlag) + 1]; // получение адреса аутпута
+
+// вывод данных в cli при отсуствии оутпута
+if (!fs.existsSync(inputPath)) {
+  // яхз
+}
+
+// объект с функциями по ключу
 const cipherObj = {
-  // объект с фннкциями по ключу
   C0: caesar,
   C1: caesar,
   R0: rot8,
@@ -68,8 +83,20 @@ const cipherObj = {
   A: atobash,
 };
 
-// вызов функций исходя из конфига
-csArr.forEach((el) => cipherObj[el](el));
+// вызов функций исходя из конфига, за параметр берется ключ
+// (работает некорректно для 2 и боллее ф-й,
+// не представилось возможным перезаписать входные данные для вновь вызываемых функций) ))
+
+const execFun = (fun) => {
+  return new Promise((res, rej) => {
+    res(fun);
+  });
+};
+csArr.forEach((el) => {
+  execFun(cipherObj[el](el)).catch((err) => {
+    console.log(err);
+  });
+});
 
 // CLI tool should accept 3 options (short alias and full name):
 

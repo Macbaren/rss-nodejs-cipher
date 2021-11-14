@@ -9,6 +9,7 @@ const rot8 = (config) => {
   const readStream = fs.createReadStream(path, 'utf-8');
   const writeStream = fs.createWriteStream('./output.txt');
 
+  // комментарии в файле caesar
   const rot8Stream = new Transform({
     transform(data, encoding, callback) {
       const rot8Encode = (str, conf) => {
@@ -44,6 +45,16 @@ const rot8 = (config) => {
       console.log('rot-8', data, cipherIt, config);
 
       callback();
+      const rewrite = () => {
+        fs.writeFile(
+          './temp.txt',
+          fs.readFileSync('./output.txt').toString(),
+          (err) => {
+            if (err) throw err;
+          }
+        );
+      };
+      rewrite();
     },
   });
 

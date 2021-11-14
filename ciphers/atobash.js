@@ -9,6 +9,7 @@ const atobash = () => {
   const readStream = fs.createReadStream(path, 'utf-8');
   const writeStream = fs.createWriteStream('./output.txt');
 
+  // комментарии в файле caesar
   const atobashStream = new Transform({
     transform(data, encoding, callback) {
       const atobashEncode = (str) => {
@@ -33,6 +34,16 @@ const atobash = () => {
       });
       console.log('atobash', cipherIt);
       callback();
+      const rewrite = () => {
+        fs.writeFile(
+          './temp.txt',
+          fs.readFileSync('./output.txt').toString(),
+          (err) => {
+            if (err) throw err;
+          }
+        );
+      };
+      rewrite();
     },
   });
   pipeline(readStream, atobashStream, writeStream, (err) => {

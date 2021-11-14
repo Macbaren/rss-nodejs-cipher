@@ -3,17 +3,19 @@ const { pipeline } = require('stream');
 const { Transform } = require('stream');
 
 const caesar = (config) => {
-  const isTemp = !!fs.readFileSync('./temp.txt').toString().length;
-  let path = isTemp ? './temp.txt' : './input.txt';
+  const isTemp = !!fs.readFileSync('./temp.txt').toString().length; // определение пути для 1го прохода
+  let path = isTemp ? './temp.txt' : './input.txt'; // если в temp еще пусто, то из input
 
   const readStream = fs.createReadStream(path, 'utf-8');
   const writeStream = fs.createWriteStream('./output.txt');
+  // console.log('path', path);
 
   const caesarStream = new Transform({
     transform(data, encoding, callback) {
+      // функция кодировки в зависимости от переданного конфига
       const caesarEncode = (str, conf) => {
-        const encode = conf === 'C1';
-        const addShift = encode ? 1 : -1;
+        const encode = conf === 'C1'; // определение конфига
+        const addShift = encode ? 1 : -1; // определение сдвига
 
         const cipherEl = (ch) => {
           const chToNum = ch.charCodeAt(0);
@@ -37,12 +39,18 @@ const caesar = (config) => {
       const cipherIt = caesarEncode(data, config);
       this.push(cipherIt);
 
-      fs.writeFile('./temp.txt', cipherIt, (err) => {
-        if (err) throw err;
-      });
-      console.log('caesar', cipherIt, path, config);
-
       callback();
+      // перезапись данных из оутпута в темп для последующих вызовов функций
+      const rewrite = () => {
+        fs.writeFile(
+          './temp.txt',
+          fs.readFileSync('./output.txt').toString(),
+          (err) => {
+            if (err) throw err;
+          }
+        );
+      };
+      rewrite();
     },
   });
 
