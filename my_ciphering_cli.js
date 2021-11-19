@@ -72,7 +72,7 @@ try {
     }
   });
 } catch (error) {
-  stderr.write('Errorrr', error);
+  stderr.write('Error: ' + error, 'utf8');
   exit(1);
 }
 
