@@ -1,4 +1,4 @@
-const LAST_UPPERCASED = 91;
+const LAST_UPPERCASED = 90;
 const FIRST_UPPERCASED = 65;
 const LAST_LOWERCASED = 122;
 const FIRST_LOWERCASED = 97;
@@ -11,16 +11,17 @@ const caesar = (str, conf) => {
   const cipherEl = (ch) => {
     const chToNum = ch.charCodeAt(0);
     const registr = encode
-      ? chToNum < LAST_UPPERCASED
+      ? chToNum <= LAST_UPPERCASED
         ? FIRST_UPPERCASED
         : FIRST_LOWERCASED
-      : chToNum < LAST_UPPERCASED
-      ? 90
+      : chToNum <= LAST_UPPERCASED
+      ? LAST_UPPERCASED
       : LAST_LOWERCASED;
     return String.fromCharCode(
       registr + ((chToNum + addShift - registr) % ALBHABET_LENGTH)
     );
   };
+
   return str
     .toString()
     .split('')

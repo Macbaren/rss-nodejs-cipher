@@ -1,12 +1,27 @@
+const LAST_UPPERCASED = 90;
+const FIRST_UPPERCASED = 65;
+const LAST_LOWERCASED = 122;
+const FIRST_LOWERCASED = 97;
+const ALBHABET_LENGTH = 26;
+
 const rot8 = (str, conf) => {
   const encode = conf === 'R1';
   const addShift = encode ? 8 : -8;
 
   const cipherEl = (ch) => {
     const chToNum = ch.charCodeAt(0);
-    const registr = encode ? (chToNum < 91 ? 65 : 97) : chToNum < 91 ? 90 : 122;
-    return String.fromCharCode(registr + ((chToNum + addShift - registr) % 26));
+    const registr = encode
+      ? chToNum <= LAST_UPPERCASED
+        ? FIRST_UPPERCASED
+        : FIRST_LOWERCASED
+      : chToNum <= LAST_UPPERCASED
+      ? LAST_UPPERCASED
+      : LAST_LOWERCASED;
+    return String.fromCharCode(
+      registr + ((chToNum + addShift - registr) % ALBHABET_LENGTH)
+    );
   };
+
   return str
     .toString()
     .split('')

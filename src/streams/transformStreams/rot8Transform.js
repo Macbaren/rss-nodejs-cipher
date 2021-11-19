@@ -1,7 +1,7 @@
 const { Transform } = require('stream');
 const rot8 = require('../../ciphers/rot-8');
 
-class rot8Transform extends Transform {
+class Rot8Transform extends Transform {
   constructor(options) {
     super(options);
     this.encode = options;
@@ -18,4 +18,4 @@ class rot8Transform extends Transform {
   }
 }
 
-module.exports = rot8Transform;
+module.exports = Rot8Transform;

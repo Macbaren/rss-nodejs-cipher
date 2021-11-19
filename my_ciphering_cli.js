@@ -1,23 +1,78 @@
-const { stderr, exit } = require('process');
+const { stderr, exit, stdin, stdout } = require('process');
 const { pipeline } = require('stream');
+
+const configValidator = require('./src/configValidator');
 const customReadable = require('./src/streams/customStreams/customReadable');
 const customWritable = require('./src/streams/customStreams/customWritable');
-const caesarTransform = require('./src/streams/transformStreams/caesarTransform');
-const atobashTransform = require('./src/streams/transformStreams/atobashTransform');
+const CaesarTransform = require('./src/streams/transformStreams/CaesarTransform');
+const AtobashTransform = require('./src/streams/transformStreams/AtobashTransform');
+const Rot8Transform = require('./src/streams/transformStreams/Rot8Transform');
 
 try {
-  const readStream = new customReadable('./input.txt');
-  const writeStream = new customWritable('./output.txt');
-  const caesarDecode = new caesarTransform('C0');
-  const atobashDecode = new atobashTransform();
-  pipeline(readStream, atobashDecode, writeStream, (err) => {
+  configValidator.configCheck(); // проверка на отутствие ошибок в конфиге
+
+  const readStream = (inputPath = configValidator.getFlagValue('-i'))
+    ? new customReadable(inputPath)
+    : stdin; // получение адреса инпута или ожидаение его ввода в КС
+
+  const writeStream = (outputPath = configValidator.getFlagValue('-o'))
+    ? new customWritable(outputPath)
+    : stdout; // получение адреса аутпута или ожидание его ввода в КС
+
+  //через объект почему-то не работает ХЗ???
+  // const transformStreamsObj = { //
+  //   C0: new CaesarTransform('C0'),
+  //   C1: new CaesarTransform('C1'),
+  //   R0: new Rot8Transform('R0'),
+  //   R1: new Rot8Transform('R1'),
+  //   A: new AtobashTransform(),
+  // };
+
+  // const ciphersArr = configValidator
+  //   .getFlagValue('-c')
+  //   .split('-')
+  //   .map((it) => transformStreamsObj[it]); // получение массива шифров и трансформклассов из него
+  // console.log('ciphers', ciphersArr.length);
+
+  let transformsArray = [];
+  configValidator
+    .getFlagValue('-c')
+    .split('-')
+    .forEach((el) => {
+      switch (el) {
+        case 'C1':
+          transformsArray.push(new CaesarTransform('C1'));
+          break;
+
+        case 'C0':
+          transformsArray.push(new CaesarTransform('C0'));
+          break;
+
+        case 'R1':
+          transformsArray.push(new Rot8Transform('R1'));
+          break;
+
+        case 'R0':
+          transformsArray.push(new Rot8Transform('R0'));
+          break;
+
+        case 'A':
+          transformsArray.push(new AtobashTransform());
+          break;
+
+        default:
+          break;
+      }
+    });
+
+  pipeline(readStream, ...transformsArray, writeStream, (err) => {
     if (err) {
       stderr.write('Error: ' + err.message);
       exit(1);
     }
   });
 } catch (error) {
-  stderr.write('Errorrr');
+  stderr.write('Errorrr', error);
   exit(1);
 }
 

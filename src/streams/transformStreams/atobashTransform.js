@@ -1,7 +1,7 @@
 const { Transform } = require('stream');
 const atobash = require('../../ciphers/atobash');
 
-class atobashTransform extends Transform {
+class AtobashTransform extends Transform {
   constructor(options) {
     super(options);
     this.encode = options;
@@ -18,4 +18,4 @@ class atobashTransform extends Transform {
   }
 }
 
-module.exports = atobashTransform;
+module.exports = AtobashTransform;

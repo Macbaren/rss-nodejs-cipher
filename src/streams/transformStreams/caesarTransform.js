@@ -2,7 +2,7 @@ const { Transform } = require('stream');
 
 const caesar = require('../../ciphers/caesar');
 
-class caesarTransform extends Transform {
+class CaesarTransform extends Transform {
   constructor(options) {
     super(options);
     this.encode = options;
@@ -19,4 +19,4 @@ class caesarTransform extends Transform {
   }
 }
 
-module.exports = caesarTransform;
+module.exports = CaesarTransform;
