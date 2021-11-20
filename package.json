@@ -1,0 +1,27 @@
+{
+  "name": "rss-nodejs-cipher",
+  "version": "1.0.0",
+  "description": "CLI tool should accept 3 options (short alias and full name):",
+  "main": "my_ciphering_cli.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Macbaren/rss-nodejs-cipher.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Macbaren/rss-nodejs-cipher/issues"
+  },
+  "homepage": "https://github.com/Macbaren/rss-nodejs-cipher#readme",
+  "devDependencies": {
+    "jest": "^27.3.1"
+  }
+}
