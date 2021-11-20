@@ -1,75 +1,80 @@
-const fs = require('fs');
-const { stdin, stdout, stderr } = require('process');
+const { stderr, exit, stdin, stdout } = require('process');
+const { pipeline } = require('stream');
 
-const caesar = require('./ciphers/caesar');
-const rot8 = require('./ciphers/rot-8');
-const atobash = require('./ciphers/atobash');
+const configValidator = require('./src/configValidator');
+const customReadable = require('./src/streams/customStreams/customReadable');
+const customWritable = require('./src/streams/customStreams/customWritable');
+const CaesarTransform = require('./src/streams/transformStreams/CaesarTransform');
+const AtobashTransform = require('./src/streams/transformStreams/AtobashTransform');
+const Rot8Transform = require('./src/streams/transformStreams/Rot8Transform');
 
-const config = process.argv.slice(2);
-console.log('config', config);
+try {
+  configValidator.configCheck(); // проверка на отутствие ошибок в конфиге
 
-//проверка на наличие конфига
-if (config.length === 0) {
-  stderr.write('You didnt type any command');
-  process.exit(1);
-}
-// проверка на аутентичность аргументов
-if (config.length !== new Set(config).size) {
-  stderr.write('You entered encorrect arguments');
-  process.exit(1);
-}
-// проверка на введение флага config
-if (config.indexOf('-c') === -1 && config.indexOf('--config') === -1) {
-  stderr.write('You have not entered or wrong config flag ');
-  process.exit(1);
-}
+  const readStream = (inputPath = configValidator.getFlagValue('-i'))
+    ? new customReadable(inputPath)
+    : stdin; // получение адреса инпута или ожидаение его ввода в КС
 
-const confFlag = config.indexOf('-c') > -1 ? '-c' : '--config'; // определение актуального флага
+  const writeStream = (outputPath = configValidator.getFlagValue('-o'))
+    ? new customWritable(outputPath)
+    : stdout; // получение адреса аутпута или ожидание его ввода в КС
 
-const cipherSequense = config[config.indexOf(confFlag) + 1];
-const csArr = cipherSequense.split('-'); // получение массива шифров
-console.log('config', csArr);
+  //через объект почему-то не работает ХЗ???
+  // const transformStreamsObj = { //
+  //   C0: new CaesarTransform('C0'),
+  //   C1: new CaesarTransform('C1'),
+  //   R0: new Rot8Transform('R0'),
+  //   R1: new Rot8Transform('R1'),
+  //   A: new AtobashTransform(),
+  // };
 
-// проверка на валидность последовательности шифров
-if (
-  csArr.length !== csArr.filter((it) => it).length || // наличие экстра дефисов
-  csArr.filter((it) => /C0|C1|R0|R1|A/g.test(it)).length !== csArr.length // валидация шифров
-) {
-  stderr.write('You entered incorrect ciphers sequense');
-  process.exit(1);
-}
+  // const ciphersArr = configValidator
+  //   .getFlagValue('-c')
+  //   .split('-')
+  //   .map((it) => transformStreamsObj[it]); // получение массива шифров и трансформклассов из него
+  // console.log('ciphers', ciphersArr.length);
 
-// проверка на введение флага input
-if (config.indexOf('-i') === -1 && config.indexOf('--input') === -1) {
-  stderr.write('You have not entered or wrong config flag.');
-  process.exit(1);
-}
+  let transformsArray = [];
+  configValidator
+    .getFlagValue('-c')
+    .split('-')
+    .forEach((el) => {
+      switch (el) {
+        case 'C1':
+          transformsArray.push(new CaesarTransform('C1'));
+          break;
 
-const inputFlag = config.indexOf('-i') > -1 ? '-i' : '--input'; // определение актуального флага
-const inputPath = config[config.indexOf(inputFlag) + 1]; // получение адреса инпута
+        case 'C0':
+          transformsArray.push(new CaesarTransform('C0'));
+          break;
 
-let newPath = '';
-if (!fs.existsSync(inputPath)) {
-  stderr.write('Wrong input path. Please input actual path');
-  stdin.on('data', (data) => {
-    newPath = data.toString();
+        case 'R1':
+          transformsArray.push(new Rot8Transform('R1'));
+          break;
+
+        case 'R0':
+          transformsArray.push(new Rot8Transform('R0'));
+          break;
+
+        case 'A':
+          transformsArray.push(new AtobashTransform());
+          break;
+
+        default:
+          break;
+      }
+    });
+
+  pipeline(readStream, ...transformsArray, writeStream, (err) => {
+    if (err) {
+      stderr.write('Error: ' + err.message);
+      exit(1);
+    }
   });
-  stdout.write(newPath);
-  // process.exit(1);
+} catch (error) {
+  stderr.write('Error: ' + error, 'utf8');
+  exit(1);
 }
-console.log('input', inputPath, newPath);
-
-const cipherObj = {
-  // объект с фннкциями по ключу
-  C0: caesar,
-  C1: caesar,
-  R0: rot8,
-  R1: rot8,
-  A: atobash,
-};
-
-// вызов функций исходя из конфига
-csArr.forEach((el) => cipherObj[el](el));
 
 // CLI tool should accept 3 options (short alias and full name):
 
