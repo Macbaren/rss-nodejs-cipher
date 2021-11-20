@@ -2,8 +2,11 @@ const {
   EmptyConfig,
   FlagDuplicate,
   NoConfigFlag,
+  BadInputPath,
+  BadOutputPath,
   IncorrectCiphers,
 } = require('./errors');
+const fs = require('fs');
 
 // приведение флагов к короткому варианту
 const reduceFlag = (f) => {
@@ -27,10 +30,18 @@ const configCheck = () => {
     throw new NoConfigFlag();
   }
 
+  if (!fs.existsSync(getFlagValue('-i'))) {
+    throw new BadInputPath();
+  }
+
+  if (!fs.existsSync(getFlagValue('-o'))) {
+    throw new BadOutputPath();
+  }
+
   const ciphersArr = getFlagValue('-c').split('-'); // получение массива шифров
   if (
     ciphersArr.length !== ciphersArr.filter((it) => it).length || // наличие экстра дефисов
-    ciphersArr.filter((it) => /C0|C1|R0|R1|A/g.test(it)).length !==
+    ciphersArr.filter((it) => /^C0$|^C1$|^R0$|^R1$|^A$/g.test(it)).length !==
       ciphersArr.length
   ) {
     throw new IncorrectCiphers();

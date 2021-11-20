@@ -22,11 +22,27 @@ class NoConfigFlag extends MyError {
     super('You have not entered or wrong config flag ');
   }
 }
-
+class BadInputPath extends MyError {
+  constructor() {
+    super('You entered nonexist input file path');
+  }
+}
+class BadOutputPath extends MyError {
+  constructor() {
+    super('You entered nonexist output file path');
+  }
+}
 class IncorrectCiphers extends MyError {
   constructor() {
     super('You entered incorrect ciphers sequense');
   }
 }
 
-module.exports = { EmptyConfig, FlagDuplicate, NoConfigFlag, IncorrectCiphers };
+module.exports = {
+  EmptyConfig,
+  FlagDuplicate,
+  NoConfigFlag,
+  BadInputPath,
+  BadOutputPath,
+  IncorrectCiphers,
+};
