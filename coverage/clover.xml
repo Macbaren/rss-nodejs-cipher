@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1637499602217" clover="3.2.0">
-  <project timestamp="1637499602217" name="All files">
+<coverage generated="1637505870872" clover="3.2.0">
+  <project timestamp="1637505870872" name="All files">
     <metrics statements="25" coveredstatements="25" conditionals="12" coveredconditionals="9" methods="6" coveredmethods="6" elements="43" coveredelements="40" complexity="0" loc="25" ncloc="25" packages="1" files="2" classes="2"/>
     <file name="atobash.js" path="D:\JSprojects\rs\rss-nodejs-cipher\src\ciphers\atobash.js">
       <metrics statements="12" coveredstatements="12" conditionals="4" coveredconditionals="4" methods="3" coveredmethods="3"/>
