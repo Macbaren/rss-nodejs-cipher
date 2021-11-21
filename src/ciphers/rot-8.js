@@ -5,20 +5,21 @@ const FIRST_LOWERCASED = 97;
 const ALBHABET_LENGTH = 26;
 
 const rot8 = (str, conf) => {
-  const encode = conf === 'R1';
-  const addShift = encode ? 8 : -8;
+  // const encode = conf === 'R1';
+  // const addShift = encode ? 8 : -8;
 
   const cipherEl = (ch) => {
     const chToNum = ch.charCodeAt(0);
-    const registr = encode
-      ? chToNum <= LAST_UPPERCASED
-        ? FIRST_UPPERCASED
-        : FIRST_LOWERCASED
-      : chToNum <= LAST_UPPERCASED
-      ? LAST_UPPERCASED
-      : LAST_LOWERCASED;
+    const registr =
+      conf === 8
+        ? chToNum <= LAST_UPPERCASED
+          ? FIRST_UPPERCASED
+          : FIRST_LOWERCASED
+        : chToNum <= LAST_UPPERCASED
+        ? LAST_UPPERCASED
+        : LAST_LOWERCASED;
     return String.fromCharCode(
-      registr + ((chToNum + addShift - registr) % ALBHABET_LENGTH)
+      registr + ((chToNum + conf - registr) % ALBHABET_LENGTH)
     );
   };
 
