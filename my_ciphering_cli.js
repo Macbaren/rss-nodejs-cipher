@@ -1,12 +1,12 @@
 const { stderr, exit, stdin, stdout } = require('process');
 const { pipeline } = require('stream');
 
-const configValidator = require('./src/configValidator');
 const customReadable = require('./src/streams/customStreams/customReadable');
 const customWritable = require('./src/streams/customStreams/customWritable');
 const CaesarTransform = require('./src/streams/transformStreams/CaesarTransform');
 const AtobashTransform = require('./src/streams/transformStreams/AtobashTransform');
 const Rot8Transform = require('./src/streams/transformStreams/Rot8Transform');
+const configValidator = require('./src/configValidator');
 
 try {
   configValidator.configCheck(); // проверка на отутствие ошибок в конфиге
@@ -41,19 +41,19 @@ try {
     .forEach((el) => {
       switch (el) {
         case 'C1':
-          transformsArray.push(new CaesarTransform('C1'));
+          transformsArray.push(new CaesarTransform(1));
           break;
 
         case 'C0':
-          transformsArray.push(new CaesarTransform('C0'));
+          transformsArray.push(new CaesarTransform(-1));
           break;
 
         case 'R1':
-          transformsArray.push(new Rot8Transform('R1'));
+          transformsArray.push(new Rot8Transform(8));
           break;
 
         case 'R0':
-          transformsArray.push(new Rot8Transform('R0'));
+          transformsArray.push(new Rot8Transform(-8));
           break;
 
         case 'A':
